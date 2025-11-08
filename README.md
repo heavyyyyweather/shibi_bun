@@ -82,3 +82,5 @@
 	- rspec
 	- factory_bot
 	- pry_rails
+
+    →画面遷移図へ
