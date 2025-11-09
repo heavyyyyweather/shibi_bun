@@ -82,3 +82,5 @@
 	- rspec
 	- factory_bot
 	- pry_rails
+
+    →画面遷移図へ→fix:画面遷移図→fix:画面遷移図修正→fix:画面遷移図修正2
