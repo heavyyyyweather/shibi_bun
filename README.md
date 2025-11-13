@@ -85,3 +85,4 @@
 
     →画面遷移図へ→fix:画面遷移図→fix:画面遷移図修正→fix:画面遷移図修正2
     →add: ER図 →fix: ER図修正 →fix: ER図修正2
+    →add: issue
