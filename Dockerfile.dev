@@ -1,0 +1,38 @@
+FROM ruby:3.3.6
+
+# 基本環境
+ENV LANG=C.UTF-8 \
+    TZ=Asia/Tokyo \
+    BUNDLE_JOBS=4 \
+    BUNDLE_RETRY=3
+
+# OSパッケージ + Node 20（Yarnはcorepack経由）
+RUN apt-get update -y && apt-get install -y --no-install-recommends \
+      build-essential \
+      libpq-dev \
+      git \
+      curl \
+      ca-certificates \
+      tzdata \
+  && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+  && apt-get install -y --no-install-recommends nodejs \
+  && corepack enable \
+  && rm -rf /var/lib/apt/lists/*
+
+# 作業ディレクトリ
+WORKDIR /app
+
+# 依存キャッシュ：先に Gemfile だけコピーして bundle
+COPY Gemfile Gemfile.lock ./
+RUN gem install bundler \
+ && bundle config set path 'vendor/bundle' \
+ && bundle install
+
+# アプリ本体（entrypoint含む）をコピー
+COPY . .
+
+# Rails用ポート
+EXPOSE 3000
+
+# デフォルトはbash（compose側の entrypoint/command で上書き）
+CMD ["bash"]

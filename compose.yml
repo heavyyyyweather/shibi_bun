@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app_development
+      TZ: Asia/Tokyo
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -q -U postgres -d app_development"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      RAILS_ENV: development
+      RACK_ENV: development
+      PGHOST: db
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: app_development
+      TZ: Asia/Tokyo
+    volumes:
+      - .:/app:cached
+      - bundle_cache:/app/vendor/bundle
+      - node_modules:/app/node_modules
+    ports:
+      - "3000:3000"
+    tty: true
+    stdin_open: true
+
+    # ★ commandで前処理 → Railsサーバ起動
+    command: >
+      bash -lc "
+        rm -f tmp/pids/server.pid &&
+        bundle install &&
+        bin/rails db:prepare &&
+        bin/rails s -b 0.0.0.0 -p 3000
+      "
+
+volumes:
+  pgdata:
+  bundle_cache:
+  node_modules:
