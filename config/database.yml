@@ -1,0 +1,15 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  host: <%= ENV.fetch("PGHOST", "db") %>
+  username: <%= ENV.fetch("PGUSER", "postgres") %>
+  password: <%= ENV.fetch("PGPASSWORD", "postgres") %>
+  database: <%= ENV.fetch("PGDATABASE", "app_development") %>
+  pool: 5
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+  database: <%= ENV.fetch("PGDATABASE_TEST", "app_test") %>
