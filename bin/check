@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -e
+
+echo "== RuboCop =="
+bundle exec rubocop
+
+echo
+echo "== RSpec =="
+bundle exec rspec
