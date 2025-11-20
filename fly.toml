@@ -1,0 +1,30 @@
+# fly.toml app configuration file generated for ichibun on 2025-11-16T16:29:55+09:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'ichibun'
+primary_region = 'nrt'
+
+[build]
+  dockerfile = 'Dockerfile'
+
+[deploy]
+  release_command = 'bin/rails db:migrate'
+
+[env]
+  PORT = '8080'
+  RACK_ENV = 'production'
+  RAILS_ENV = 'production'
+  RAILS_LOG_TO_STDOUT = 'true'
+  RAILS_SERVE_STATIC_FILES = 'true'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  size = 'shared-cpu-1x'
