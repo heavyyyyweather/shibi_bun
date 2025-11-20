@@ -1,24 +1,40 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Fly.io 初回デプロイ手順
+開発は Docker Compose（`Dockerfile.dev`）、本番は Fly.io（`Dockerfile`）で運用します。  
+1回目のデプロイ（＝環境作成）用の手順です。2回目以降は `fly deploy` だけでOK。
 
-Things you may want to cover:
+### 1. アプリ作成（launch）
 
-* Ruby version
+`fly launch --no-deploy`
 
-* System dependencies
+- App name：任意
+- Region：nrt
+- Internal port：Dockerfile に合わせて 8080
+- Postgres：None
+- `.dockerignore`：Yes
 
-* Configuration
+### 2. Postgres を作成 & 接続
 
-* Database creation
+`fly postgres create --name <APP>-db --region nrt --volume-size 1 fly postgres attach --app <APP> <APP>-db`
 
-* Database initialization
+これで `DATABASE_URL` が Fly Secrets に自動設定される。
 
-* How to run the test suite
+### 3. Rails の master key を登録
 
-* Services (job queues, cache servers, search engines, etc.)
+`fly secrets set RAILS_MASTER_KEY=$(cat config/master.key)`
 
-* Deployment instructions
+### 4. デプロイ
 
-* ...
+`fly deploy`
+
+### 5. 動作確認
+
+`https://<APP>.fly.dev/up   → 200 OK（ヘルスチェック） https://<APP>.fly.dev/     → アプリトップ`
+
+
+---
+
+## 2回目以降のデプロイ
+
+`fly deploy`
