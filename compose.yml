@@ -39,6 +39,8 @@ services:
       - "3000:3000"
     tty: true
     stdin_open: true
+    env_file:
+      - .env.local
 
     # ★ commandで前処理 → Railsサーバ起動
     command: >
