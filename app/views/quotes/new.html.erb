@@ -1,0 +1,63 @@
+<h1>一文を投稿する</h1>
+
+<%# 🔍 書籍検索フォーム（GET /quotes/new） %>
+<%= form_with url: new_quote_path, method: :get, local: true do |f| %>
+  <div>
+    <%= f.label :book_search, "書籍を検索（タイトルの一部）" %><br>
+    <%= f.text_field :book_search, value: @book_search %>
+    <%= f.submit "検索" %>
+  </div>
+
+  <%# ★ 検索しても本文が消えないように hidden で持ち回る %>
+  <%= hidden_field_tag "quote[body]", @quote&.body %>
+  <%= hidden_field_tag "quote[page]", @quote&.page %>
+<% end %>
+
+<hr>
+
+<%# ✏️ 引用投稿フォーム（POST /quotes） %>
+<%= form_with model: @quote, url: quotes_path, local: true do |f| %>
+  <% if @quote.errors.any? %>
+    <div style="color: red;">
+      <ul>
+        <% @quote.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div style="margin-top: 1rem;">
+    <strong>書籍を選択</strong><br>
+
+    <% if @book_candidates.present? %>
+      <% @book_candidates.each do |book| %>
+        <div>
+          <label>
+            <%= f.radio_button :book_id, book.id, checked: (@quote.book_id == book.id) %>
+            <%= book.title %>
+            <% if book.publisher.present? %>
+              （<%= book.publisher %>）
+            <% end %>
+          </label>
+        </div>
+      <% end %>
+    <% else %>
+      <p>検索すると候補が表示されます。</p>
+    <% end %>
+  </div>
+
+  <div style="margin-top: 1rem;">
+    <%= f.label :body, "引用本文（200字以内）" %><br>
+    <%= f.text_area :body, rows: 5 %>
+  </div>
+
+  <div style="margin-top: 1rem;">
+    <%= f.label :page, "ページ番号（任意）" %><br>
+    <%= f.number_field :page %>
+  </div>
+
+  <div style="margin-top: 1.5rem;">
+    <%= f.submit "投稿する" %>
+  </div>
+<% end %>
