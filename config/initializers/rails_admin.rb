@@ -1,6 +1,12 @@
 RailsAdmin.config do |config|
   config.asset_source = :sprockets
 
+  config.authenticate_with do
+    authenticate_or_request_with_http_basic("Admin Area") do |username, password|
+      username == ENV["ADMIN_USER"] && password == ENV["ADMIN_PASSWORD"]
+    end
+  end
+
   ### Popular gems integration
 
   ## == Devise ==
