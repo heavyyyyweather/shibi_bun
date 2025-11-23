@@ -1,4 +1,5 @@
 class QuotesController < ApplicationController
+  before_action :set_book_search, only: %i[new create]
   before_action :set_book_candidates, only: %i[new create]
 
   def new
@@ -13,13 +14,12 @@ class QuotesController < ApplicationController
 
   def create
     @quote = Quote.new(quote_params)
-    @quote.status ||= :pending
+    @quote.status ||= :pending  # ※モデル側デフォルトに寄せてもOK
 
     if @quote.save
       redirect_to root_path, notice: "投稿を受け付けました（承認待ちです）"
     else
-      # バリデーションエラー時に、同じ検索結果・同じ book_search を再現するため
-      @book_search = params[:book_search]
+      # バリデーションエラー時も、同じ検索状態を再現したい
       set_book_candidates
       render :new, status: :unprocessable_entity
     end
@@ -31,9 +31,11 @@ class QuotesController < ApplicationController
     params.require(:quote).permit(:body, :page, :book_id)
   end
 
-  def set_book_candidates
+  def set_book_search
     @book_search = params[:book_search]
+  end
 
+  def set_book_candidates
     @book_candidates =
       if @book_search.present?
         Book.where("title ILIKE ?", "%#{@book_search}%").order(:title)

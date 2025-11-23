@@ -11,7 +11,7 @@ class BooksController < ApplicationController
       redirect_to new_quote_path(
         book_search: @book.title,
         selected_book_id: @book.id
-      )
+      ), notice: "書籍を登録しました。続けて一文を投稿できます。"
     else
       render :new, status: :unprocessable_entity
     end
