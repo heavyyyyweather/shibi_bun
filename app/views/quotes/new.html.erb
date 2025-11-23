@@ -1,63 +1,74 @@
 <h1>一文を投稿する</h1>
 
-<%# 🔍 書籍検索フォーム（GET /quotes/new） %>
+<%# 🔍 書籍検索フォーム（まずはこれで本を探す） %>
 <%= form_with url: new_quote_path, method: :get, local: true do |f| %>
   <div>
     <%= f.label :book_search, "書籍を検索（タイトルの一部）" %><br>
     <%= f.text_field :book_search, value: @book_search %>
     <%= f.submit "検索" %>
   </div>
-
-  <%# ★ 検索しても本文が消えないように hidden で持ち回る %>
-  <%= hidden_field_tag "quote[body]", @quote&.body %>
-  <%= hidden_field_tag "quote[page]", @quote&.page %>
 <% end %>
 
 <hr>
 
-<%# ✏️ 引用投稿フォーム（POST /quotes） %>
-<%= form_with model: @quote, url: quotes_path, local: true do |f| %>
-  <% if @quote.errors.any? %>
-    <div style="color: red;">
-      <ul>
-        <% @quote.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+<%# まだ検索していない場合 %>
+<% if @book_search.blank? %>
+  <p>まず本のタイトルで検索してください。</p>
 
-  <div style="margin-top: 1rem;">
-    <strong>書籍を選択</strong><br>
+<% else %>
+  <%# 検索語あり %>
 
-    <% if @book_candidates.present? %>
-      <% @book_candidates.each do |book| %>
-        <div>
-          <label>
-            <%= f.radio_button :book_id, book.id, checked: (@quote.book_id == book.id) %>
-            <%= book.title %>
-            <% if book.publisher.present? %>
-              （<%= book.publisher %>）
+  <% if @book_candidates.present? %>
+    <%# 🔹 ヒットがある場合：本を選んで「本文」を入力 %>
+    <%= form_with model: @quote, url: quotes_path, local: true do |f| %>
+      <% if @quote.errors.any? %>
+        <div style="color: red;">
+          <ul>
+            <% @quote.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
             <% end %>
-          </label>
+          </ul>
         </div>
       <% end %>
-    <% else %>
-      <p>検索すると候補が表示されます。</p>
+
+      <div style="margin-top: 1rem;">
+        <strong>書籍を選択</strong><br>
+        <% @book_candidates.each do |book| %>
+          <div>
+            <label>
+              <%= f.radio_button :book_id, book.id, checked: (@quote.book_id == book.id) %>
+              <%= book.title %>
+              <% if book.publisher.present? %>
+                （<%= book.publisher %>）
+              <% end %>
+            </label>
+          </div>
+        <% end %>
+      </div>
+
+      <div style="margin-top: 1rem;">
+        <%= f.label :body, "引用本文（200字以内）" %><br>
+        <%= f.text_area :body, rows: 5 %>
+      </div>
+
+      <div style="margin-top: 1rem;">
+        <%= f.label :page, "ページ番号（任意）" %><br>
+        <%= f.number_field :page %>
+      </div>
+
+      <%# バリデーションエラーで戻ったときも同じ検索語の結果を出すため %>
+      <%= hidden_field_tag :book_search, @book_search %>
+
+      <div style="margin-top: 1.5rem;">
+        <%= f.submit "投稿する" %>
+      </div>
     <% end %>
-  </div>
 
-  <div style="margin-top: 1rem;">
-    <%= f.label :body, "引用本文（200字以内）" %><br>
-    <%= f.text_area :body, rows: 5 %>
-  </div>
-
-  <div style="margin-top: 1rem;">
-    <%= f.label :page, "ページ番号（任意）" %><br>
-    <%= f.number_field :page %>
-  </div>
-
-  <div style="margin-top: 1.5rem;">
-    <%= f.submit "投稿する" %>
-  </div>
+  <% else %>
+    <%# 🔹 ヒットなしの場合：Quick Add への導線 %>
+    <p>「<%= @book_search %>」に一致する書籍は見つかりませんでした。</p>
+    <p>
+      <%= link_to "＋この本を追加", new_book_path(title: @book_search) %>
+    </p>
+  <% end %>
 <% end %>

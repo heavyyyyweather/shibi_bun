@@ -1,0 +1,24 @@
+<h1>この本を追加</h1>
+
+<% if @book.errors.any? %>
+  <div style="color: red;">
+    <ul>
+      <% @book.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: @book, url: books_path, local: true do |f| %>
+  <div>
+    <%= f.label :title, "書名（必須）" %><br>
+    <%= f.text_field :title %>
+  </div>
+
+  <%# 将来、contributors や isbn13 などもここに増やしていく予定 %>
+
+  <div style="margin-top: 1rem;">
+    <%= f.submit "登録して引用入力へ進む" %>
+  </div>
+<% end %>
