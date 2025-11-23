@@ -1,63 +1,138 @@
 <h1>一文を投稿する</h1>
 
-<%# 🔍 書籍検索フォーム（GET /quotes/new） %>
-<%= form_with url: new_quote_path, method: :get, local: true do |f| %>
-  <div>
-    <%= f.label :book_search, "書籍を検索（タイトルの一部）" %><br>
-    <%= f.text_field :book_search, value: @book_search %>
-    <%= f.submit "検索" %>
-  </div>
+<%# ---------------------------------------------------- %>
+<%# ステップ表示（視覚的なガイド）                     %>
+<%# ---------------------------------------------------- %>
+<nav style="margin-bottom: 1.5rem; font-size: 0.9rem;">
+  <strong>Step 1.</strong> 本をえらぶ →
+  <strong>Step 2.</strong> 一文を書く
+</nav>
 
-  <%# ★ 検索しても本文が消えないように hidden で持ち回る %>
-  <%= hidden_field_tag "quote[body]", @quote&.body %>
-  <%= hidden_field_tag "quote[page]", @quote&.page %>
-<% end %>
+<%# ==================================================== %>
+<%# A. 書籍検索エリア                                   %>
+<%# ==================================================== %>
+<section id="quote-book-search" style="margin-bottom: 1.5rem;">
+  <h2 style="font-size: 1rem;">本をえらぶ</h2>
+
+  <p style="font-size: 0.9rem; color: #555;">
+    まず本のタイトルの一部で検索してください。<br>
+    （あとから著者名や ISBN でも検索できるように拡張予定です）
+  </p>
+
+  <%= form_with url: new_quote_path, method: :get, local: true do |f| %>
+    <div style="margin-top: 0.5rem;">
+      <%= f.label :book_search, "書籍を検索（タイトルの一部）" %><br>
+      <%= f.text_field :book_search, value: @book_search, style: "width: 100%; max-width: 320px;" %>
+    </div>
+
+    <div style="margin-top: 0.5rem;">
+      <%= f.submit "検索", style: "padding: 0.3rem 0.8rem;" %>
+    </div>
+  <% end %>
+</section>
 
 <hr>
 
-<%# ✏️ 引用投稿フォーム（POST /quotes） %>
-<%= form_with model: @quote, url: quotes_path, local: true do |f| %>
-  <% if @quote.errors.any? %>
-    <div style="color: red;">
-      <ul>
-        <% @quote.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+<%# ==================================================== %>
+<%# B. 書籍候補エリア                                   %>
+<%#    - 未検索                                         %>
+<%#    - 検索結果あり                                  %>
+<%#    - 検索結果なし                                  %>
+<%# ==================================================== %>
+<section id="quote-book-candidates" style="margin: 1.5rem 0;">
+  <h2 style="font-size: 1rem;">検索結果</h2>
 
-  <div style="margin-top: 1rem;">
-    <strong>書籍を選択</strong><br>
+  <% if @book_search.blank? %>
+    <%# --- 状態1: まだ検索していない --- %>
+    <p style="font-size: 0.9rem; color: #777;">
+      まだ検索されていません。上のフォームから本を検索してください。
+    </p>
+
+  <% else %>
+    <%# book_search があるときは、候補の有無で分岐 %>
 
     <% if @book_candidates.present? %>
-      <% @book_candidates.each do |book| %>
-        <div>
-          <label>
-            <%= f.radio_button :book_id, book.id, checked: (@quote.book_id == book.id) %>
-            <%= book.title %>
-            <% if book.publisher.present? %>
-              （<%= book.publisher %>）
+      <%# --- 状態2: 検索結果あり --- %>
+      <p style="font-size: 0.9rem;">
+        「<%= @book_search %>」の検索結果：<%= @book_candidates.size %>件
+      </p>
+
+      <%# このあと C. 引用本文エリアで使うフォームも一緒に描画 %>
+      <%= form_with model: @quote, url: quotes_path, local: true do |f| %>
+        <% if @quote.errors.any? %>
+          <div style="color: red; margin-bottom: 1rem;">
+            <ul>
+              <% @quote.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div style="margin-top: 0.5rem;">
+          <strong>書籍を選択してください</strong>
+          <div style="margin-top: 0.5rem;">
+            <% @book_candidates.each do |book| %>
+              <div style="margin-bottom: 0.25rem;">
+                <label>
+                  <%= f.radio_button :book_id, book.id, checked: (@quote.book_id == book.id) %>
+                  <%= book.title %>
+                  <% if book.publisher.present? %>
+                    （<%= book.publisher %>）
+                  <% end %>
+                </label>
+              </div>
             <% end %>
-          </label>
+          </div>
+        </div>
+
+        <%# ------------------------------------------ %>
+        <%# C. 引用本文エリア                          %>
+        <%#    ※ 現段階では「本が選ばれていなくても表示」%>
+        <%#       後で Stimulus/Turbo で段階的に出す予定   %>
+        <%# ------------------------------------------ %>
+        <section id="quote-body-section" style="margin-top: 2rem;">
+          <h2 style="font-size: 1rem;">一文を書く</h2>
+
+          <p style="font-size: 0.9rem; color: #555; margin-bottom: 0.5rem;">
+            本を選んだうえで、その本の中から心に残った一文を投稿してください。
+          </p>
+
+          <div style="margin-top: 0.5rem;">
+            <%= f.label :body, "引用本文（200字以内）" %><br>
+            <%= f.text_area :body, rows: 5, style: "width: 100%; max-width: 480px;" %>
+          </div>
+
+          <div style="margin-top: 0.5rem;">
+            <%= f.label :page, "ページ番号（任意）" %><br>
+            <%= f.number_field :page, style: "width: 120px;" %>
+          </div>
+
+          <%# バリデーションエラーで戻ったときも同じ検索語の結果を出すため %>
+          <%= hidden_field_tag :book_search, @book_search %>
+
+          <div style="margin-top: 1rem;">
+            <%= f.submit "投稿する", style: "padding: 0.4rem 1rem;" %>
+          </div>
+        </section>
+
+        <%# Quick Add への導線（最終手段） %>
+        <div style="margin-top: 1.5rem; font-size: 0.9rem; color: #555;">
+          お探しの本が候補にない場合は、
+          <%= link_to "本を登録する", new_book_path(title: @book_search) %>
+          から手動で登録できます。
         </div>
       <% end %>
+
     <% else %>
-      <p>検索すると候補が表示されます。</p>
+      <%# --- 状態3: 検索結果なし --- %>
+      <p style="font-size: 0.9rem; color: #777;">
+        「<%= @book_search %>」に一致する書籍は見つかりませんでした。
+      </p>
+
+      <div style="margin-top: 0.5rem; font-size: 0.9rem;">
+        <%= link_to "本を登録する（タイトルのみ手入力）", new_book_path(title: @book_search) %>
+      </div>
     <% end %>
-  </div>
-
-  <div style="margin-top: 1rem;">
-    <%= f.label :body, "引用本文（200字以内）" %><br>
-    <%= f.text_area :body, rows: 5 %>
-  </div>
-
-  <div style="margin-top: 1rem;">
-    <%= f.label :page, "ページ番号（任意）" %><br>
-    <%= f.number_field :page %>
-  </div>
-
-  <div style="margin-top: 1.5rem;">
-    <%= f.submit "投稿する" %>
-  </div>
-<% end %>
+  <% end %>
+</section>

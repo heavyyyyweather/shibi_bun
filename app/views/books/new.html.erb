@@ -1,0 +1,29 @@
+<h1>この本を追加</h1>
+
+<p style="font-size: 0.9rem; color: #555;">
+  検索しても見つからなかった本を、タイトルのみで登録します。<br>
+  登録後は引用文の投稿画面に戻ります。
+</p>
+
+<% if @book.errors.any? %>
+  <div style="color: red; margin-bottom: 1rem;">
+    <ul>
+      <% @book.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: @book, url: books_path, local: true do |f| %>
+  <div>
+    <%= f.label :title, "書名（必須）" %><br>
+    <%= f.text_field :title, style: "width: 100%; max-width: 320px;" %>
+  </div>
+
+  <%# 将来、contributors や isbn13 などもここに増やしていく予定 %>
+
+  <div style="margin-top: 1rem;">
+    <%= f.submit "登録して引用入力へ進む" %>
+  </div>
+<% end %>
