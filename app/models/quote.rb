@@ -8,6 +8,9 @@ class Quote < ApplicationRecord
   }, _prefix: true
   # => quote.status_pending? / quote.status_published! みたいに使える
 
+  # 公開済みQuoteだけを取るためのスコープ
+  scope :published, -> { where(status: statuses[:published]) }
+
   validates :body, presence: true, length: { maximum: 200 }
   validates :page,
             numericality: { only_integer: true, allow_nil: true, greater_than: 0 }
