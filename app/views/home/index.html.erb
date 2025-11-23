@@ -1,10 +1,14 @@
-<% if notice.present? %>
-  <p style="color: green;"><%= notice %></p>
-<% end %>
-
 <h1>Ichibun</h1>
 
 <p>
   <%= link_to "一文を投稿する", new_quote_path %>
 </p>
 
+<hr>
+
+<h2>公開された一文（確認用）</h2>
+
+<% @quotes.each do |quote| %>
+  <p><%= quote.body %></p>
+  <hr>
+<% end %>
