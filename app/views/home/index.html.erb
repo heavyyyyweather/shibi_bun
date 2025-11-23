@@ -6,9 +6,20 @@
 
 <hr>
 
-<h2>公開された一文（確認用）</h2>
+<h2>公開された一文</h2>
 
-<% @quotes.each do |quote| %>
-  <p><%= quote.body %></p>
-  <hr>
+<% if @quotes.blank? %>
+  <p>まだ公開された一文はありません。</p>
+<% else %>
+  <ul style="list-style: none; padding: 0;">
+    <% @quotes.each do |quote| %>
+      <li style="margin-bottom: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 1rem;">
+        <p><%= quote.body %></p>
+      </li>
+    <% end %>
+  </ul>
+
+  <div style="margin-top: 1rem;">
+    <%= paginate @quotes %>
+  </div>
 <% end %>
