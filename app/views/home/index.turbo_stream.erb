@@ -1,16 +1,18 @@
-<%# 1) 既存の一覧の末尾に、新しいページのQuoteをappendする %>
+<%# app/views/home/index.turbo_stream.erb %>
+
 <%= turbo_stream.append "quotes" do %>
   <%= render @quotes %>
 <% end %>
 
-<%# 2) 「さらに表示」ボタンを差し替える（次のページ or ボタン消去） %>
 <%= turbo_stream.replace "pagination" do %>
-  <%= turbo_frame_tag "pagination" do %>
+  <%# ここで <div id="pagination"> の中身をまるごと入れ替えるイメージ %>
+  <div id="pagination">
     <% if @quotes.next_page.present? %>
       <div style="margin-top: 1rem; text-align: center;">
         <%= link_to "さらに表示",
-            root_path(page: @quotes.next_page, format: :turbo_stream) %>
+                    root_path(page: @quotes.next_page, format: :turbo_stream) %>
       </div>
     <% end %>
-  <% end %>
+  </div>
 <% end %>
+
