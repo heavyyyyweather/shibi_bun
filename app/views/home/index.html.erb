@@ -11,15 +11,17 @@
 <% if @quotes.blank? %>
   <p>まだ公開された一文はありません。</p>
 <% else %>
-  <ul style="list-style: none; padding: 0;">
-    <% @quotes.each do |quote| %>
-      <li style="margin-bottom: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 1rem;">
-        <p><%= quote.body %></p>
-      </li>
-    <% end %>
+  <ul id="quotes" style="list-style: none; padding: 0;">
+    <%= render @quotes %> <%# _quote.html.erb を使う %>
   </ul>
 
-  <div style="margin-top: 1rem;">
-    <%= paginate @quotes %>
+  <div id="pagination">
+    <% if @quotes.next_page.present? %>
+      <div style="margin-top: 1rem; text-align: center;">
+        <%= link_to "さらに表示",
+                    root_path(page: @quotes.next_page, format: :turbo_stream) %>
+      </div>
+    <% end %>
   </div>
 <% end %>
+

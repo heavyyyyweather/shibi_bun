@@ -1,0 +1,18 @@
+<%# app/views/home/index.turbo_stream.erb %>
+
+<%= turbo_stream.append "quotes" do %>
+  <%= render @quotes %>
+<% end %>
+
+<%= turbo_stream.replace "pagination" do %>
+  <%# ここで <div id="pagination"> の中身をまるごと入れ替えるイメージ %>
+  <div id="pagination">
+    <% if @quotes.next_page.present? %>
+      <div style="margin-top: 1rem; text-align: center;">
+        <%= link_to "さらに表示",
+                    root_path(page: @quotes.next_page, format: :turbo_stream) %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
