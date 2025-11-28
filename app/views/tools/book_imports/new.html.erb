@@ -1,0 +1,31 @@
+<h1>ISBNから書籍を一括登録</h1>
+
+<%= form_with url: tools_book_imports_path,
+              method: :post,
+              local: true,
+              data: { turbo: false } do %>
+  <p>1行に1つISBN13を書いてください。</p>
+  <%= text_area_tag :isbns, params[:isbns], rows: 10, cols: 40 %>
+  <br>
+  <%= submit_tag "登録する" %>
+<% end %>
+
+<% if @results.present? %>
+  <hr>
+  <h2>結果</h2>
+  <ul>
+    <% @results.each do |r| %>
+      <li>
+        <%= r[:isbn] %> :
+        <% case r[:status]
+           when :created %>
+          登録完了（<%= r[:title] %>）
+        <% when :not_found %>
+          openBDで見つかりませんでした
+        <% else %>
+          エラー: <%= r[:error] %>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

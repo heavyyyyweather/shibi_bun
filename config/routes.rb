@@ -4,7 +4,11 @@ Rails.application.routes.draw do
 
   resources :quotes, only: %i[new create]
   resources :books, only: %i[new create]
-
+  
+  namespace :tools do
+    resource :book_imports, only: %i[new create]
+  end
+  
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
