@@ -1,0 +1,49 @@
+<h1>ISBN + 引用を一度に登録</h1>
+
+<% if @errors.present? %>
+  <div class="alert alert-danger">
+    <ul>
+      <% @errors.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<% if flash.now[:notice].present? %>
+  <p class="alert alert-success"><%= flash.now[:notice] %></p>
+<% end %>
+
+<%= form_with url: tools_book_quotes_path,
+              method: :post,
+              local: true,
+              data: { turbo: false } do %>
+  <div>
+    <label>ISBN（10/13どちらでも・ハイフン可）</label><br>
+    <%= text_field_tag :isbn, params[:isbn] %>
+  </div>
+
+  <div style="margin-top: 1rem;">
+    <label>引用本文</label><br>
+    <%= text_area_tag :body, params[:body], rows: 5, cols: 50 %>
+  </div>
+
+  <div style="margin-top: 1rem;">
+    <label>ページ（任意）</label><br>
+    <%= text_field_tag :page, params[:page] %>
+  </div>
+
+  <div style="margin-top: 1rem;">
+    <%= submit_tag "登録する" %>
+  </div>
+<% end %>
+
+<% if @book && @quote %>
+  <hr>
+  <h2>登録結果</h2>
+  <p>
+    書籍: <strong><%= @book.title %></strong><br>
+    ISBN: <%= @book.isbn13 %><br>
+    Quote ID: <%= @quote.id %>
+  </p>
+<% end %>

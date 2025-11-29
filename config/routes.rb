@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   
   namespace :tools do
     resource :book_imports, only: %i[new create]
+    resource :book_quotes,  only: %i[new create]
   end
   
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

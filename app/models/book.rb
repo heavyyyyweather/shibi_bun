@@ -13,6 +13,24 @@ class Book < ApplicationRecord
   validates :title, presence: true
   validates :isbn13, length: { in: 10..13 }, uniqueness: true, allow_blank: true
 
+  # =========================
+  # ここからクラスメソッドたち
+  # =========================
+
+  # 「ISBNを渡されたら、既存Bookを探す or Google Booksから作る」
+  def self.fetch_or_create_by_isbn(raw_isbn)
+    # フォームから来た文字列をまず正規化（ハイフン削除）
+    numeric = raw_isbn.to_s.delete("-").strip
+
+    # すでに登録済みならそれを返す
+    if (book = find_by(isbn13: numeric))
+      return book
+    end
+
+    # なければ Google Books 経由で作成
+    create_from_google_books(raw_isbn)
+  end
+
   def self.parse_published_date(value)
     return nil if value.blank?
 
@@ -27,12 +45,11 @@ class Book < ApplicationRecord
     # ① フォームから来た文字列をまず正規化（ハイフン削除）
     numeric_isbn = raw_isbn.to_s.delete("-").strip
 
-    # 1. API から volume 情報を取得
-    # ② API にはハイフンなしで投げる
+    # 1. API から volume 情報を取得（APIにはハイフンなしで投げる）
     volume = GoogleBooksClient.fetch_by_isbn(numeric_isbn)
     return nil unless volume
 
-    info = volume["volumeInfo"] || {}
+    info        = volume["volumeInfo"] || {}
     identifiers = info["industryIdentifiers"] || []
     images      = info["imageLinks"] || {}
     authors     = info["authors"] || []
@@ -55,7 +72,7 @@ class Book < ApplicationRecord
       api_synced_at: Time.current
     )
 
-    # 5. 著者情報を Contributors / BookContributions に流し込む
+    # 4. 著者情報を Contributors / BookContributions に流し込む
     authors.each_with_index do |author_name, idx|
       contributor = Contributor.find_or_create_by!(name: author_name)
 
