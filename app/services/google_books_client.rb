@@ -20,4 +20,18 @@ class GoogleBooksClient
     Rails.logger.error("[GoogleBooksClient] error: #{e.class} #{e.message}")
     nil
   end
+
+  # 追加: フリーワード検索（タイトル、著者、ISBN など）
+  def self.search(query, max_results: 10)
+    return [] if query.blank?
+
+    res = Faraday.get(ENDPOINT, {
+      q: query,
+      maxResults: max_results,
+      langRestrict: "ja"  # 必要なら
+    })
+
+    body = JSON.parse(res.body) rescue {}
+    (body["items"] || [])
+  end
 end
