@@ -1,7 +1,7 @@
 <li id="<%= dom_id(quote) %>" class="quote-item">
   <article class="quote-card">
     <p class="quote-body-vertical">
-      <%= quote.body %>
+      <%= simple_format(h(quote.body), {}, wrapper_tag: "span") %>
     </p>
   </article>
 </li>
