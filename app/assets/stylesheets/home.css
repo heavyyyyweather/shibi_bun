@@ -1,0 +1,107 @@
+.home-page {
+  min-height: 100vh;
+  margin: 0;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+}
+
+.home-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.site-title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.new-quote-link {
+  margin: 0;
+}
+
+.new-quote-link a {
+  text-decoration: none;
+  font-size: 0.95rem;
+  border: 1px solid #333;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+}
+
+.home-divider {
+  margin: 0.5rem 0 1rem;
+}
+
+.home-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.section-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.quotes-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* 1画面1文 */
+.quote-item {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;  /* カードを中央寄せ */
+  align-items: center;
+}
+
+/* ================================
+ * カード（今回のメイン変更）
+ * ================================ */
+.quote-card {
+  /* カードのサイズを画面で決める */
+  width: 65vw;     /* 画面の65%の幅 → 縦書きなので「横幅」が「高さ」扱い */
+  height: 80vh;    /* 画面の80%の高さ → 「縦幅」を狭めるイメージ */
+
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+
+  padding: 1.5rem;
+  overflow-y: auto;       /* 長文ならカード内だけスクロール */
+
+  background: #fafafa;
+  border: 1px solid #ccc; /* 境界 */
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+
+  font-family: "YuMincho", "Hiragino Mincho ProN", "Noto Serif JP", serif;
+  font-size: 1.8rem;
+  line-height: 1.8;
+  letter-spacing: 0.08em;
+  color: #222;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.quote-body-vertical {
+  margin: 0;
+}
+
+/* スマホ用にカードを少し広げる */
+@media (max-width: 600px) {
+  .quote-card {
+    width: 85vw;
+    height: 75vh;
+    font-size: 1.4rem;
+    padding: 1rem;
+  }
+}

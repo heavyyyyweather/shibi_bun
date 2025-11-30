@@ -1,3 +1,7 @@
-<li style="margin-bottom: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 1rem;">
-  <p><%= quote.body %></p>
+<li id="<%= dom_id(quote) %>" class="quote-item">
+  <article class="quote-card">
+    <p class="quote-body-vertical">
+      <%= quote.body %>
+    </p>
+  </article>
 </li>

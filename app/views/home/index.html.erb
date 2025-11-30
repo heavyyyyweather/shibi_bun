@@ -1,27 +1,34 @@
-<h1>Ichibun</h1>
+<div class="home-page">
+  <header class="home-header">
+    <h1 class="site-title">Ichibun</h1>
 
-<p>
-  <%= link_to "一文を投稿する", new_quote_path %>
-</p>
+    <p class="new-quote-link">
+      <%= link_to "一文を投稿する", new_quote_path %>
+    </p>
+  </header>
 
-<hr>
+  <hr class="home-divider">
 
-<h2>公開された一文</h2>
+  <main class="home-main">
+    <h2 class="section-title">公開された一文</h2>
 
-<% if @quotes.blank? %>
-  <p>まだ公開された一文はありません。</p>
-<% else %>
-  <ul id="quotes" style="list-style: none; padding: 0;">
-    <%= render @quotes %> <%# _quote.html.erb を使う %>
-  </ul>
+    <% if @quotes.blank? %>
+      <p class="empty-message">まだ公開された一文はありません。</p>
+    <% else %>
+      <!-- turbo_stream 側からも参照されるリスト -->
+      <ul id="quotes" class="quotes-list">
+        <%= render @quotes %> <%# _quote.html.erb を使う %>
+      </ul>
 
-  <div id="pagination">
-    <% if @quotes.next_page.present? %>
-      <div style="margin-top: 1rem; text-align: center;">
-        <%= link_to "さらに表示",
-                    root_path(page: @quotes.next_page, format: :turbo_stream) %>
+      <div id="pagination" class="pagination">
+        <% if @quotes.next_page.present? %>
+          <div class="pagination-inner">
+            <%= link_to "さらに表示",
+                        root_path(page: @quotes.next_page, format: :turbo_stream),
+                        class: "load-more-link" %>
+          </div>
+        <% end %>
       </div>
     <% end %>
-  </div>
-<% end %>
-
+  </main>
+</div>
