@@ -1,164 +1,90 @@
-<h1>一文を投稿する</h1>
+<div class="container my-4">
+  <h1 class="mb-4">一文を投稿する</h1>
 
-<nav style="margin-bottom: 1.5rem; font-size: 0.9rem;">
-  <strong>Step 1.</strong> 本をえらぶ →
-  <strong>Step 2.</strong> 一文を書く
-</nav>
+  <!-- ステップ案内 -->
+  <nav class="mb-4 small text-muted">
+    <strong>Step 1.</strong> 本をえらぶ →
+    <strong>Step 2.</strong> 一文を書く
+  </nav>
 
-<%# ============================== %>
-<%# A. 書籍検索フォーム（GET）     %>
-<%# ============================== %>
-<section id="quote-book-search" style="margin-bottom: 1.5rem;">
-  <h2 style="font-size: 1rem;">本をえらぶ</h2>
+  <!-- Step 1: 書籍検索フォーム -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h2 class="h6">Step 1: 本をえらぶ</h2>
+      <p class="small text-muted">本のタイトル・著者名・ISBNのいずれかで検索できます。</p>
 
-  <p style="font-size: 0.9rem; color: #555;">
-    本のタイトル・著者名・ISBNのいずれかで検索できます。
-  </p>
-
-  <%= form_with url: new_quote_path, method: :get, local: true do |f| %>
-    <div style="margin-top: 0.5rem;">
-      <%= f.label :book_search, "書籍を検索（タイトル / 著者 / ISBN）" %><br>
-      <%= f.text_field :book_search, value: @book_search, style: "width: 100%; max-width: 320px;" %>
-    </div>
-
-    <div style="margin-top: 0.5rem;">
-      <%= f.submit "検索", style: "padding: 0.3rem 0.8rem;" %>
-    </div>
-  <% end %>
-</section>
-
-<hr>
-
-<%# ============================== %>
-<%# B. 投稿フォーム（POST /quotes）%>
-<%# ============================== %>
-<section id="quote-form" style="margin: 1.5rem 0;">
-  <h2 style="font-size: 1rem;">本を選んで、一文を書く</h2>
-
-  <%= form_with model: @quote,
-                url:   quotes_path,
-                local: true,
-                data: { turbo: false } do |f| %>
-
-    <%# --- エラー表示 --- %>
-    <% if @quote.errors.any? %>
-      <div style="color: red; margin-bottom: 1rem;">
-        <ul>
-          <% @quote.errors.full_messages.each do |msg| %>
-            <li><%= msg %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
-
-    <%# 検索語は hidden で保持しておく %>
-    <%= hidden_field_tag :book_search, @book_search %>
-
-    <%# -------------------------------- %>
-    <%# B-1. 書籍候補の一覧             %>
-    <%# -------------------------------- %>
-    <div style="margin-top: 0.5rem;">
-      <strong>書籍を選択してください</strong>
-
-      <% if @book_search.blank? %>
-        <p style="font-size: 0.9rem; color: #777; margin-top: 0.5rem;">
-          上のフォームから本を検索してください。
-        </p>
-      <% else %>
-        <% has_any_candidates = false %>
-
-        <%# --- ローカルDBの結果 --- %>
-        <% if @book_candidates.present? %>
-          <% has_any_candidates = true %>
-          <div style="margin-top: 0.5rem;">
-            <h3 style="font-size: 0.9rem; margin-bottom: 0.25rem;">このアプリ内の本</h3>
-
-            <% @book_candidates.each do |book| %>
-              <div style="margin-bottom: 0.25rem;">
-                <label>
-                  <%= f.radio_button :book_id, book.id, checked: (@quote.book_id == book.id) %>
-                  <%= book.title %>
-                  <% if book.publisher.present? %>
-                    （<%= book.publisher %>）
-                  <% end %>
-                </label>
-              </div>
-            <% end %>
-          </div>
-        <% end %>
-
-        <%# --- Google Books の結果 --- %>
-        <% if @google_volumes.present? %>
-          <% has_any_candidates = true %>
-          <div style="margin-top: 1rem;">
-            <h3 style="font-size: 0.9rem; margin-bottom: 0.25rem;">Google Books から見つかった本</h3>
-
-            <% @google_volumes.each do |volume| %>
-              <% info = volume["volumeInfo"] || {} %>
-              <% identifiers = info["industryIdentifiers"] || [] %>
-              <% isbn_13 = identifiers.find { |id| id["type"] == "ISBN_13" }&.dig("identifier") %>
-              <% next if isbn_13.blank? %>
-
-              <div style="margin-bottom: 0.25rem;">
-                <label>
-                  <%# ★ここは POST フォームの中！ %>
-                  <%= radio_button_tag :google_isbn,
-                                       isbn_13,
-                                       params[:google_isbn] == isbn_13 %>
-
-                  <%= info["title"] %>
-                  <% if info["authors"].present? %>
-                    ― <%= info["authors"].join(", ") %>
-                  <% end %>
-                </label>
-              </div>
-            <% end %>
-          </div>
-        <% end %>
-
-        <% unless has_any_candidates %>
-          <p style="font-size: 0.9rem; color: #777; margin-top: 0.5rem;">
-            「<%= @book_search %>」に一致する書籍は見つかりませんでした。
-          </p>
-
-          <div style="margin-top: 0.5rem; font-size: 0.9rem;">
-            <%= link_to "本を登録する（タイトルのみ手入力）", new_book_path(title: @book_search) %>
-          </div>
-        <% end %>
+      <%= form_with url: new_quote_path, method: :get, local: true do |f| %>
+        <div class="mb-2">
+          <%= f.label :book_search, "書籍を検索", class: "form-label" %>
+          <%= f.text_field :book_search, value: @book_search, class: "form-control", placeholder: "タイトル / 著者 / ISBN" %>
+        </div>
+        <%= f.submit "検索", class: "btn btn-primary" %>
       <% end %>
     </div>
+  </div>
 
-    <%# -------------------------------- %>
-    <%# B-2. 引用本文                     %>
-    <%# -------------------------------- %>
-    <section id="quote-body-section" style="margin-top: 2rem;">
-      <h2 style="fontサイズ: 1rem;">一文を書く</h2>
+  <!-- Step 2: 投稿フォーム -->
+  <div class="card">
+    <div class="card-body">
+      <h2 class="h6">Step 2: 一文を書く</h2>
 
-      <p style="font-size: 0.9rem; color: #555; margin-bottom: 0.5rem;">
-        本を選んだうえで、その本の中から心に残った一文を投稿してください。
-      </p>
+      <%= form_with model: @quote, url: quotes_path, local: true, data: { turbo: false } do |f| %>
+        <%= hidden_field_tag :book_search, @book_search %>
 
-      <div style="margin-top: 0.5rem;">
-        <%= f.label :body, "引用本文（200字以内）" %><br>
-        <%= f.text_area :body, rows: 5, style: "width: 100%; max-width: 480px;" %>
-      </div>
+        <!-- エラー表示 -->
+        <% if @quote.errors.any? %>
+          <div class="alert alert-danger">
+            <ul class="mb-0">
+              <% @quote.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
 
-      <div style="margin-top: 0.5rem;">
-        <%= f.label :page, "ページ番号（任意）" %><br>
-        <%= f.number_field :page, style: "width: 120px;" %>
-      </div>
+        <!-- 書籍候補 -->
+        <div class="mb-3">
+          <strong>書籍を選択してください</strong>
+          <% if @book_candidates.present? %>
+            <% @book_candidates.each do |book| %>
+              <div class="form-check">
+                <%= f.radio_button :book_id, book.id, class: "form-check-input", checked: (@quote.book_id == book.id) %>
+                <%= f.label :book_id, "#{book.title}（#{book.publisher}）", class: "form-check-label" %>
+              </div>
+            <% end %>
+          <% elsif @google_volumes.present? %>
+            <% @google_volumes.each do |volume| %>
+              <% info = volume["volumeInfo"] || {} %>
+              <% isbn_13 = info.dig("industryIdentifiers")&.find { |id| id["type"] == "ISBN_13" }&.dig("identifier") %>
+              <% next if isbn_13.blank? %>
+              <div class="form-check">
+                <%= radio_button_tag :google_isbn, isbn_13, params[:google_isbn] == isbn_13, class: "form-check-input" %>
+                <%= label_tag :google_isbn, "#{info["title"]} ― #{info["authors"]&.join(", ")}", class: "form-check-label" %>
+              </div>
+            <% end %>
+          <% else %>
+            <p class="text-muted small mt-2">
+              「<%= @book_search %>」に一致する書籍は見つかりませんでした。
+              <%= link_to "手動で登録する", new_book_path(title: @book_search) %>
+            </p>
+          <% end %>
+        </div>
 
-      <div style="margin-top: 1rem;">
-        <%= f.submit "投稿する", style: "padding: 0.4rem 1rem;" %>
-      </div>
-    </section>
+        <!-- 引用本文 -->
+        <div class="mb-3">
+          <%= f.label :body, "引用本文（200字以内）", class: "form-label" %>
+          <%= f.text_area :body, rows: 5, class: "form-control" %>
+        </div>
 
-    <% if @book_search.present? %>
-      <div style="margin-top: 1.5rem; font-size: 0.9rem; color: #555;">
-        お探しの本が候補にない場合は、
-        <%= link_to "本を登録する", new_book_path(title: @book_search) %>
-        から手動で登録できます。
-      </div>
-    <% end %>
-  <% end %>
-</section>
+        <!-- ページ番号 -->
+        <div class="mb-3">
+          <%= f.label :page, "ページ番号（任意）", class: "form-label" %>
+          <%= f.number_field :page, class: "form-control", style: "width: 120px;" %>
+        </div>
+
+        <!-- 投稿ボタン -->
+        <%= f.submit "投稿する", class: "btn btn-success" %>
+      <% end %>
+    </div>
+  </div>
+</div>

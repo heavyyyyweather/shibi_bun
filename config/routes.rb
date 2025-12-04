@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   get "home/index"
 
   resources :quotes, only: %i[new create]
-  resources :books, only: %i[new create]
+  resources :books, only: %i[new create show]
   
   namespace :tools do
     resource :book_imports, only: %i[new create]

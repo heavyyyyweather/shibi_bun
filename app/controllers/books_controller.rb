@@ -17,6 +17,14 @@ class BooksController < ApplicationController
     end
   end
 
+  def show
+    @book = Book.find(params[:id])
+
+    respond_to do |format|
+      format.turbo_stream
+    end
+  end
+
   private
 
   def book_params

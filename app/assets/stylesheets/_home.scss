@@ -1,0 +1,44 @@
+.quote-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 0;
+}
+
+.quote-card {
+  width: 65vw;
+  height: 80vh;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  overflow-y: auto;
+  padding: 1.5rem;
+
+  background: #fefefe;
+  border: 1px solid #ccc;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.2s ease;
+
+  font-family: "YuMincho", "Hiragino Mincho ProN", "Noto Serif JP", serif;
+  font-size: 1.6rem;
+  line-height: 1.8;
+  letter-spacing: 0.08em;
+  color: #222;
+}
+
+.quote-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.quote-body {
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .quote-card {
+    width: 85vw;
+    height: 75vh;
+    font-size: 1.3rem;
+    padding: 1rem;
+  }
+}

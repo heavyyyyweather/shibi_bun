@@ -1,3 +1,4 @@
+<!-- app/views/home/index.html.erb -->
 <div class="home-page">
   <header class="home-header">
     <h1 class="site-title">Ichibun</h1>
@@ -20,15 +21,18 @@
         <%= render @quotes %> <%# _quote.html.erb を使う %>
       </ul>
 
-      <div id="pagination" class="pagination">
+      <div id="pagination">
         <% if @quotes.next_page.present? %>
-          <div class="pagination-inner">
+          <div class="d-flex justify-content-center my-4">
             <%= link_to "さらに表示",
-                        root_path(page: @quotes.next_page, format: :turbo_stream),
-                        class: "load-more-link" %>
+                  root_path(page: @quotes.next_page, format: :turbo_stream),
+                  class: "btn btn-outline-primary load-more-button" %>
           </div>
         <% end %>
       </div>
     <% end %>
   </main>
 </div>
+
+<!-- Turbo Frameでモーダル内容を差し込む -->
+<%= turbo_frame_tag "book_modal" %>
