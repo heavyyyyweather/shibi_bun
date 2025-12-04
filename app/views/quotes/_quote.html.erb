@@ -1,7 +1,10 @@
-<li id="<%= dom_id(quote) %>" class="quote-item">
-  <article class="quote-card">
-    <p class="quote-body-vertical">
-      <%= simple_format(h(quote.body), {}, wrapper_tag: "span") %>
-    </p>
-  </article>
+<!-- app/views/quotes/_quote.html.erb -->
+<li id="<%= dom_id(quote) %>" class="quote-item mb-4">
+  <div class="card quote-card shadow-sm">
+    <div class="card-body d-flex justify-content-center align-items-center">
+      <p class="quote-body mb-0">
+        <%= simple_format(h(quote.body), {}, wrapper_tag: "span") %>
+      </p>
+    </div>
+  </div>
 </li>
