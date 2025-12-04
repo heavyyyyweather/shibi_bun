@@ -59,8 +59,13 @@ class Book < ApplicationRecord
     normalized_isbn = (isbn_13.presence || numeric_isbn)
 
     # 3. 書影URL（なければ nil でOK）
-    cover_url = images["thumbnail"] || images["smallThumbnail"]
-
+    cover_url =
+      images["extraLarge"] ||
+      images["large"] ||
+      images["medium"] ||
+      images["thumbnail"] ||
+      images["smallThumbnail"]
+      
     book = create!(
       title:         info["title"],
       publisher:     info["publisher"],

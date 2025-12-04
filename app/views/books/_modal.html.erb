@@ -1,0 +1,39 @@
+<div class="modal-overlay" data-controller="modal" data-action="click->modal#close">
+  <div class="modal-content" data-action="click->modal#stop">
+    <%# --- 書影 --- %>
+    <% if book.cover_url.present? %>
+      <div class="text-center mb-3">
+        <img src="<%= book.cover_url %>" alt="書影" class="img-fluid" style="max-height: 300px;">
+      </div>
+    <% end %>
+
+    <%# --- 書誌情報 --- %>
+    <div class="text-center">
+      <h5><%= book.title %></h5>
+
+      <%# 著者 %>
+      <% authors = book.book_contributions.includes(:contributor).where(role: :author).map(&:contributor) %>
+      <% if authors.any? %>
+        <p class="mb-1"><strong>著者:</strong> <%= authors.map(&:name).join(" / ") %></p>
+      <% end %>
+
+      <%# 翻訳者 %>
+      <% translators = book.book_contributions.includes(:contributor).where(role: :translator).map(&:contributor) %>
+      <% if translators.any? %>
+        <p class="mb-1"><strong>翻訳:</strong> <%= translators.map(&:name).join(" / ") %></p>
+      <% end %>
+
+      <% if book.publisher.present? %>
+        <p class="mb-1 text-muted">出版社: <%= book.publisher %></p>
+      <% end %>
+
+      <% if book.published_on.present? %>
+        <p class="mb-1 text-muted">出版年: <%= book.published_on.year %></p>
+      <% end %>
+
+      <% if book.isbn13.present? %>
+        <p class="mb-1 text-muted">ISBN: <%= book.isbn13 %></p>
+      <% end %>
+    </div>
+  </div>
+</div>
