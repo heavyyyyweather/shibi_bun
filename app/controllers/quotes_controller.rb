@@ -11,38 +11,14 @@ class QuotesController < ApplicationController
     @quote       = Quote.new(quote_params)
 
     ActiveRecord::Base.transaction do
-      # 1) 既存の Book を選んだ場合
-      if @quote.book_id.present?
-        @book = @quote.book
+      assign_book!
 
-      # 2) Google Books の候補を選んだ場合
-      elsif params[:google_isbn].present?
-        @book = Book.fetch_or_create_by_isbn(params[:google_isbn])
-
-        if @book.nil?
-          @quote.errors.add(:base, "Google Books から書籍情報を取得できませんでした。")
-          raise ActiveRecord::Rollback
-        end
-
-        @quote.book = @book
-
-      # 3) どちらも選ばれてない
-      else
-        @quote.errors.add(:base, "本を選択してください")
-        raise ActiveRecord::Rollback
-      end
-
-      # Quote 自体の保存
-      unless @quote.save
-        raise ActiveRecord::Rollback
-      end
+      save_quote!
     end
 
-    # ここまで来ていれば保存成功
     if @quote.persisted?
       redirect_to root_path, notice: "投稿を受け付けました（承認待ちです）"
     else
-      # ロールバックされたときはこちら
       load_candidates_for(@book_search)
       render :new, status: :unprocessable_entity
     end
@@ -52,6 +28,28 @@ class QuotesController < ApplicationController
 
   def quote_params
     params.require(:quote).permit(:body, :page, :book_id)
+  end
+
+  def assign_book!
+    if @quote.book_id.present?
+      @book = @quote.book
+    elsif params[:google_isbn].present?
+      @book = Book.fetch_or_create_by_isbn(params[:google_isbn])
+      if @book.nil?
+        @quote.errors.add(:base, "Google Books から書籍情報を取得できませんでした。")
+        raise ActiveRecord::Rollback
+      end
+      @quote.book = @book
+    else
+      @quote.errors.add(:base, "本を選択してください")
+      raise ActiveRecord::Rollback
+    end
+  end
+
+  def save_quote!
+    unless @quote.save
+      raise ActiveRecord::Rollback
+    end
   end
 
   def load_candidates_for(keyword)
