@@ -21,6 +21,8 @@ gem "jbuilder"
 
 gem "kaminari"
 gem "faraday"
+gem 'bootstrap', '~> 5.1.3'
+gem 'sassc-rails'
 
 
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
@@ -69,4 +71,3 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
-gem "sassc-rails"
