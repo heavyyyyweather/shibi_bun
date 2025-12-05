@@ -21,7 +21,7 @@ gem "jbuilder"
 
 gem "kaminari"
 gem "faraday"
-gem 'bootstrap', '~> 5.1.3'
+gem 'bootstrap', '~> 5.3.5'
 gem 'sassc-rails'
 
 
