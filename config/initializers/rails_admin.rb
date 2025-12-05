@@ -52,6 +52,32 @@ RailsAdmin.config do |config|
     end
   end
 
+  config.model 'Book' do
+    list do
+      field :title
+      field :isbn13
+      field :api_provider
+      field :api_synced_at
+    end
+
+    show do
+      field :title
+      field :isbn13
+      field :publisher
+      field :published_on
+      field :cover_url
+      field :api_provider
+      field :api_synced_at
+      field :api_payload do
+        pretty_value do
+          if value.present?
+            "<pre style='white-space: pre-wrap; max-height: 300px; overflow-y: scroll;'>#{JSON.pretty_generate(value)}</pre>".html_safe
+          end
+        end
+      end
+    end
+  end
+
   config.actions do
     dashboard                     # mandatory
     index                         # mandatory

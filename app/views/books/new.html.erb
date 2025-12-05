@@ -1,29 +1,30 @@
-<h1>この本を追加</h1>
+<h2>書籍の追加</h2>
 
-<p style="font-size: 0.9rem; color: #555;">
-  検索しても見つからなかった本を、タイトルのみで登録します。<br>
-  登録後は引用文の投稿画面に戻ります。
-</p>
+<!-- ISBN から検索 -->
+<section style="margin-bottom: 2rem;">
+  <h3>ISBNで検索</h3>
+  <%= form_with url: create_by_isbn_books_path, method: :post, local: true do |form| %>
+    <div>
+      <%= form.label :isbn, "ISBNコード（13桁）" %><br>
+      <%= form.text_field :isbn, placeholder: "例: 9784049122205" %>
+    </div>
+    <div style="margin-top: 1rem;">
+      <%= form.submit "APIから検索して追加", class: "btn" %>
+    </div>
+  <% end %>
+</section>
 
-<% if @book.errors.any? %>
-  <div style="color: red; margin-bottom: 1rem;">
-    <ul>
-      <% @book.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-    </ul>
-  </div>
-<% end %>
+<!-- 手動登録（MVP向け） -->
+<section>
+  <h3>手動登録</h3>
+  <%= form_with model: @book, local: true do |form| %>
+    <div>
+      <%= form.label :title, "書名（必須）" %><br>
+      <%= form.text_field :title, placeholder: "例: 吾輩は猫である" %>
+    </div>
 
-<%= form_with model: @book, url: books_path, local: true do |f| %>
-  <div>
-    <%= f.label :title, "書名（必須）" %><br>
-    <%= f.text_field :title, style: "width: 100%; max-width: 320px;" %>
-  </div>
-
-  <%# 将来、contributors や isbn13 などもここに増やしていく予定 %>
-
-  <div style="margin-top: 1rem;">
-    <%= f.submit "登録して引用入力へ進む" %>
-  </div>
-<% end %>
+    <div style="margin-top: 1rem;">
+      <%= form.submit "書籍を登録", class: "btn" %>
+    </div>
+  <% end %>
+</section>
