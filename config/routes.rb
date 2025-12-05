@@ -6,6 +6,7 @@ Rails.application.routes.draw do
 
   resources :books, only: %i[new create show] do
     collection do
+      get :search
       post :create_by_isbn
     end
   end
