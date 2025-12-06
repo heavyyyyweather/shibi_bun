@@ -11,9 +11,9 @@ class OpenbdClient
     return nil unless response.is_a?(Net::HTTPSuccess)
 
     result = JSON.parse(response.body)
-    result.first # 配列で返ってくるため
-  rescue StandardError => e
-    Rails.logger.error "[OpenBDClient] Error: #{e.message}"
+    result.first.presence
+  rescue => e
+    Rails.logger.error("[OpenbdClient] error: #{e.class} #{e.message}")
     nil
   end
 end
