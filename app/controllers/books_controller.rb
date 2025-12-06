@@ -22,7 +22,12 @@ class BooksController < ApplicationController
 
     if book_data
       book = Book.find_or_initialize_by(isbn13: book_data[:isbn13])
-      book.assign_attributes(book_data.slice(:title, :publisher, :published_on, :cover_url, :provider))
+      book.assign_attributes(book_data.slice(
+        :title, :publisher, :published_on,
+        :cover_url, :api_provider,
+        :api_synced_at, :api_payload, :contributors
+      )
+    )
       book.save!
       redirect_to new_quote_path(book_search: book.title, selected_book_id: book.id),
                   notice: "#{book.title} を登録・取得しました。続けて一文を投稿できます。"
@@ -39,17 +44,28 @@ class BooksController < ApplicationController
   end
 
   def search
-    @query = params[:q].to_s.strip
-    @results = []
+  @query = params[:q].to_s.strip.gsub(/[^0-9]/, "")
+  @results = []
 
   if isbn13?(@query)
-    result = OpenbdClient.fetch_by_isbn(@query)
-    if result
-      isbn13 = result.dig("summary", "isbn")
-      cover_url = AmazonCoverHelper.url_for(isbn13)
+    book_data = BookLookupService.lookup(@query)
+    if book_data
+      cover_url = book_data[:cover_url]
       Rails.logger.debug("cover_url: #{cover_url}")
+      Rails.logger.debug("api_provider: #{book_data[:api_provider]}")
+      Rails.logger.debug("isbn13 used for cover_url: #{book_data[:isbn13]}")
 
-      @results << { source: "OpenBD", data: result, cover_url: cover_url }
+      @results << {
+        source: book_data[:api_provider],
+        data: { "summary" => {
+          "title" => book_data[:title],
+          "author" => book_data[:author], # ここも必要に応じて
+          "publisher" => book_data[:publisher],
+          "pubdate" => book_data[:published_on],
+          "isbn" => book_data[:isbn13]
+        }},
+        cover_url: cover_url
+      }
     end
   end
 end
