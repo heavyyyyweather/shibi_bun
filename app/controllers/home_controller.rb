@@ -2,7 +2,7 @@
 class HomeController < ApplicationController
   def index
     @quotes = Quote.published
-                   .order(published_at: :desc)
+                   .order(Arel.sql("RANDOM()"))
                    .includes(:book)
                    .page(params[:page])
                    .per(10)
