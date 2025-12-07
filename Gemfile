@@ -59,6 +59,7 @@ group :development, :test do
   # コードスタイルチェック
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+  gem "dotenv-rails"
 end
 
 group :development do

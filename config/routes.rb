@@ -3,13 +3,19 @@ Rails.application.routes.draw do
   get "home/index"
 
   resources :quotes, only: %i[new create]
-  resources :books, only: %i[new create show]
-  
+
+  resources :books, only: %i[new create show] do
+    collection do
+      get :search
+      post :create_by_isbn
+    end
+  end
+
   namespace :tools do
     resource :book_imports, only: %i[new create]
     resource :book_quotes,  only: %i[new create]
   end
-  
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

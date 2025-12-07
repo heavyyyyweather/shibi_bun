@@ -1,0 +1,52 @@
+<div class="container my-4">
+  <h1 class="mb-4">Step 1: ISBNで検索</h1>
+
+  <%= form_with url: search_books_path, method: :get, local: true do |f| %>
+    <div class="mb-3">
+      <%= f.label :q, "ISBN（13桁）", class: "form-label" %>
+      <%= f.text_field :q, value: @query, class: "form-control", placeholder: "例: 9784101010038" %>
+    </div>
+    <%= f.submit "検索", class: "btn btn-primary" %>
+  <% end %>
+
+  <% if @query.present? %>
+    <hr>
+    <h2 class="h5">検索結果</h2>
+
+    <% if @results.any? %>
+      <div class="row">
+        <% @results.each do |res| %>
+          <% summary = res[:data]["summary"] %>
+          <% title = summary["title"] %>
+          <% author = summary["author"] %>
+          <% publisher = summary["publisher"] %>
+          <% pubdate = summary["pubdate"] %>
+          <% isbn13 = summary["isbn"] %>
+          <% cover_url = res[:cover_url] %>
+
+          <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+              <% if cover_url.present? %>
+                <img src="<%= cover_url %>" class="card-img-top" alt="<%= title %>">
+              <% end %>
+              <div class="card-body">
+                <h5 class="card-title"><%= title %></h5>
+                <p class="card-text small">
+                  <%= author %><br>
+                  <%= publisher %><br>
+                  <%= pubdate %>
+                </p>
+                <%= button_to "この本を選ぶ", create_by_isbn_books_path(isbn: isbn13),
+                              method: :post,
+                              class: "btn btn-sm btn-success" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-muted mt-3">「<%= @query %>」に一致する書誌情報は見つかりませんでした。</p>
+      <%= link_to "手動で登録する", new_book_path(title: @query), class: "btn btn-outline-secondary" %>
+    <% end %>
+  <% end %>
+</div>
