@@ -1,7 +1,19 @@
 class QuotesController < ApplicationController
   def new
-    @book = Book.find_by(id: params[:selected_book_id])
-    redirect_to search_books_path, alert: "書籍が見つかりませんでした" and return unless @book
+    # BooksController から渡される ID を拾う
+    book_id =
+      if params[:selected_book_id].present?
+        params[:selected_book_id]
+      else
+        params[:book_id]
+      end
+
+    @book = Book.find_by(id: book_id)
+
+    if @book.nil?
+      redirect_to search_books_path, alert: "先に書籍を選択してください"
+      return
+    end
 
     @quote = Quote.new(book: @book)
   end

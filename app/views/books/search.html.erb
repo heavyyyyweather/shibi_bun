@@ -22,7 +22,7 @@
   <% end %>
 
   <div class="mt-4">
-    <%= link_to "手動で登録する", new_book_path(title: @query), class: "btn btn-outline-secondary" %>
+    <%= link_to "手動で登録する", new_book_path(isbn: @query), class: "btn btn-outline-secondary" %>
   </div>
 
   <% if @query.present? %>
@@ -40,8 +40,8 @@
           <% isbn13 = summary["isbn"] %>
           <% cover_url = res[:cover_url] %>
 
-          <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100">
+          <div class="col-md-4 col-sm-6 mb-4">
+            <div class="card h-100 book-card">
               <% if cover_url.present? %>
                 <img src="<%= cover_url %>" class="card-img-top" alt="<%= title %>">
               <% end %>

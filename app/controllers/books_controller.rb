@@ -2,16 +2,33 @@
 
 class BooksController < ApplicationController
   def new
-    @book = Book.new(title: params[:title])
+    @book = Book.new(isbn13: params[:isbn])
   end
+
 
   def create
     @book = Book.new(book_params)
+    @book.api_provider = :manual  # 手動登録
 
     if @book.save
+      # 著者レコードを紐づける
+      if @book.author_name.present?
+        cleaned_name = Book.clean_person_name(@book.author_name)
+        contributor = Contributor.find_or_create_by!(name: cleaned_name)
+        BookContribution.find_or_create_by!(
+          book: @book,
+          contributor: contributor,
+          role: :author,
+          position: 0
+        )
+      end
+
       redirect_to new_quote_path(book_search: @book.title, selected_book_id: @book.id),
-                  notice: "書籍を登録しました。続けて一文を投稿できます。"
+                  notice: "書籍を手動登録しました。続けて一文を投稿できます。"
+
     else
+      # ★保存に失敗したときだけフラッシュを出して new を再表示
+      flash.now[:alert] = @book.errors.full_messages.to_sentence
       render :new, status: :unprocessable_entity
     end
   end
@@ -85,6 +102,11 @@ class BooksController < ApplicationController
   end
 
   def book_params
-    params.require(:book).permit(:title)
+    params.require(:book).permit(
+      :isbn13,
+      :title,
+      :author_name,
+      :publisher
+    )
   end
 end

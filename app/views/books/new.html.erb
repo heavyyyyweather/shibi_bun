@@ -1,30 +1,48 @@
-<h2>書籍の追加</h2>
+<!-- app/views/books/new.html.erb -->
 
-<!-- ISBN から検索 -->
-<section style="margin-bottom: 2rem;">
-  <h3>ISBNで検索</h3>
-  <%= form_with url: create_by_isbn_books_path, method: :post, local: true do |form| %>
-    <div>
-      <%= form.label :isbn, "ISBNコード（13桁）" %><br>
-      <%= form.text_field :isbn, placeholder: "例: 9784049122205" %>
-    </div>
-    <div style="margin-top: 1rem;">
-      <%= form.submit "APIから検索して追加", class: "btn" %>
-    </div>
-  <% end %>
-</section>
+<h2>書籍の手動登録</h2>
 
-<!-- 手動登録（MVP向け） -->
-<section>
-  <h3>手動登録</h3>
-  <%= form_with model: @book, local: true do |form| %>
-    <div>
-      <%= form.label :title, "書名（必須）" %><br>
-      <%= form.text_field :title, placeholder: "例: 吾輩は猫である" %>
-    </div>
+<p class="text-muted small">
+  ISBN検索で書誌情報が取得できなかった場合は、ここから手動で登録してください。
+</p>
 
-    <div style="margin-top: 1rem;">
-      <%= form.submit "書籍を登録", class: "btn" %>
-    </div>
-  <% end %>
-</section>
+<%= form_with model: @book, local: true do |form| %>
+  <!-- ISBN 必須 -->
+  <div class="mb-3">
+    <%= form.label :isbn13, "ISBNコード（必須）" %><br>
+    <%= form.text_field :isbn13,
+          class: "form-control",
+          required: true %>
+  </div>
+
+  <!-- 書名 必須 -->
+  <div class="mb-3">
+    <%= form.label :title, "書名（必須）" %><br>
+    <%= form.text_field :title,
+          placeholder: "例: ねじまき鳥クロニクル〈第1部〉泥棒かささぎ編",
+          class: "form-control",
+          required: true %>
+  </div>
+
+  <!-- 著者名 必須 -->
+  <div class="mb-3">
+    <%= form.label :author_name, "著者名（必須）" %><br>
+    <%= form.text_field :author_name,
+          placeholder: "例: 村上 春樹",
+          class: "form-control",
+          required: true %>
+  </div>
+
+  <!-- 出版社 必須 -->
+  <div class="mb-3">
+    <%= form.label :publisher, "出版社（必須）" %><br>
+    <%= form.text_field :publisher,
+          placeholder: "例: 新潮社",
+          class: "form-control",
+          required: true %>
+  </div>
+
+  <div class="mt-3">
+    <%= form.submit "書籍を登録", class: "btn btn-primary" %>
+  </div>
+<% end %>

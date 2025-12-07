@@ -7,7 +7,8 @@
       <h2 class="h6">投稿対象の本</h2>
       <p>
         <strong><%= @book.title %></strong><br>
-        <%= @book.publisher %>（<%= @book.published_on&.strftime("%Y-%m-%d") %>）<br>
+        <%= @book.publisher %>
+        <%= "（#{@book.published_on.strftime('%Y-%m-%d')}）" if @book.published_on.present? %><br>
         ISBN: <%= @book.isbn13 %>
       </p>
       <% if @book.cover_url.present? %>
