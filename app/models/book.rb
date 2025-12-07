@@ -1,4 +1,5 @@
 # app/models/book.rb
+
 class Book < ApplicationRecord
   has_many :quotes, dependent: :destroy
   has_many :book_contributions, dependent: :destroy
@@ -14,124 +15,73 @@ class Book < ApplicationRecord
   validates :title, presence: true
   validates :isbn13, length: { in: 10..13 }, uniqueness: true, allow_blank: true
 
-  # =========================
-  # ここからクラスメソッドたち
-  # =========================
-
-  def self.fetch_or_create_by_isbn(raw_isbn)
-    numeric = raw_isbn.to_s.delete("-").strip
-
-    if (book = find_by(isbn13: numeric))
-      return book
-    end
-
-    create_from_isbn_sources(numeric)
-  end
-
   def self.parse_published_date(value)
     return nil if value.blank?
 
     if value.match?(/\A\d{4}\z/)
       Date.new(value.to_i, 1, 1) rescue nil
+    elsif value.match?(/\A\d{6}\z/)
+      year = value[0..3].to_i
+      month = value[4..5].to_i
+      Date.new(year, month, 1) rescue nil
     else
       Date.parse(value) rescue nil
     end
   end
 
-  def self.create_from_isbn_sources(isbn)
-    [
-      [:openbd, OpenbdClient.fetch_by_isbn(isbn)],
-      [:rakuten, RakutenBooksClient.fetch_by_isbn(isbn)],
-      [:google, GoogleBooksClient.fetch_by_isbn(isbn)]
-    ].each do |provider, payload|
-      next if payload.blank?
+  def self.create_from_openbd_payload(payload, fallback_isbn = nil)
+    summary = payload["summary"]
+    return nil unless summary
 
-      book = create_book_from_payload(provider, payload, isbn)
-      return book if book
-    end
+    isbn13      = summary["isbn"] || fallback_isbn
+    title       = summary["title"] || "書名不明"
+    publisher   = summary["publisher"]
+    pubdate     = summary["pubdate"]
+    cover_url   = AmazonCoverHelper.url_for(isbn13) # OpenBDのcoverを無視してAmazonに統一
 
-    nil
-  end
+    # Contributor 情報は構造的に onix から抽出
+    contributors = Array.wrap(payload.dig("onix", "DescriptiveDetail", "Contributor"))
+    authors = contributors
+      .map { |c| c.dig("PersonName", "content") }
+      .compact
+      .map { |name| name.gsub(",", " ").gsub(/\d{4}(-\d{4})?$/, "").strip }
+      .uniq
 
-  def self.create_book_from_payload(provider, payload, isbn)
-    case provider
-    when :openbd
-      summary = payload["summary"]
-      return nil unless summary
+    book = Book.find_or_initialize_by(isbn13: isbn13)
+    book.assign_attributes(
+      title: title,
+      publisher: publisher,
+      published_on: self.parse_published_date(pubdate),
+      cover_url: cover_url,
+      api_provider: :openbd,
+      api_payload: payload,
+      api_synced_at: Time.current
+    )
+    book.save!
 
-      title       = summary["title"] || "書名不明"
-      publisher   = summary["publisher"]
-      pubdate     = summary["pubdate"]
-      isbn13      = summary["isbn"] || isbn
-      cover_url   = summary["cover"]
-      authors     = summary["author"]&.split(/[、,\/]/)&.map(&:strip) || []
-
-      book = create!(
-        title: title,
-        publisher: publisher,
-        published_on: parse_published_date(pubdate),
-        isbn13: isbn13,
-        cover_url: cover_url,
-        api_provider: :openbd,
-        api_payload: payload,
-        api_synced_at: Time.current
-      )
-
-    when :rakuten
-      item = payload["Item"]
-      return nil unless item
-
-      title       = item["title"]
-      publisher   = item["publisherName"]
-      pubdate     = item["salesDate"]
-      isbn13      = item["isbn"] || isbn
-      cover_url   = item["largeImageUrl"]
-      authors     = item["author"]&.split(/[、,\/]/)&.map(&:strip) || []
-
-      book = create!(
-        title: title,
-        publisher: publisher,
-        published_on: parse_published_date(pubdate),
-        isbn13: isbn13,
-        cover_url: cover_url,
-        api_provider: :rakuten,
-        api_payload: payload,
-        api_synced_at: Time.current
-      )
-
-    when :google
-      info        = payload["volumeInfo"] || {}
-      identifiers = info["industryIdentifiers"] || []
-      images      = info["imageLinks"] || {}
-      authors     = info["authors"] || []
-
-      isbn13 = identifiers.find { |id| id["type"] == "ISBN_13" }&.dig("identifier") || isbn
-      cover_url = images["extraLarge"] || images["large"] || images["medium"] ||
-                  images["thumbnail"] || images["smallThumbnail"]
-
-      book = create!(
-        title: info["title"],
-        publisher: info["publisher"],
-        published_on: parse_published_date(info["publishedDate"]),
-        isbn13: isbn13,
-        cover_url: cover_url,
-        api_provider: :google,
-        api_payload: payload,
-        api_synced_at: Time.current
-      )
-
-    else
-      return nil
-    end
-
-    # 共通：著者の登録
-    authors.each_with_index do |name, idx|
+    # 著者の登録（重複回避つき）
+    contributors.each_with_index do |contrib, idx|
+      name = contrib.dig("PersonName", "content")
       next if name.blank?
+
+      name = name.gsub(",", " ").gsub(/\d{4}(-\d{4})?$/, "").strip
+
+      roles = Array.wrap(contrib["ContributorRole"])
+      role_value = if roles.include?("A01")       # 著者
+                 :author
+               elsif roles.include?("B06")     # 翻訳者
+                 :translator
+               elsif roles.include?("B01")     # 編者
+                 :editor
+               else
+                 :author                       # デフォルトは著者
+               end
+
       contributor = Contributor.find_or_create_by!(name: name)
       BookContribution.find_or_create_by!(
         book: book,
         contributor: contributor,
-        role: :author
+        role: role_value
       ) { |bc| bc.position = idx }
     end
 

@@ -17,22 +17,15 @@ class BooksController < ApplicationController
   end
 
   def create_by_isbn
-    isbn = params[:isbn].to_s.strip
-    book_data = BookLookupService.lookup(isbn)
+    isbn = params[:isbn]&.delete("-")&.strip
+    payload = OpenbdClient.fetch_by_isbn(isbn)
 
-    if book_data
-      book = Book.find_or_initialize_by(isbn13: book_data[:isbn13])
-      book.assign_attributes(book_data.slice(
-        :title, :publisher, :published_on,
-        :cover_url, :api_provider,
-        :api_synced_at, :api_payload, :contributors
-      )
-    )
-      book.save!
+    if payload.present?
+      book = Book.create_from_openbd_payload(payload, isbn)
       redirect_to new_quote_path(book_search: book.title, selected_book_id: book.id),
                   notice: "#{book.title} を登録・取得しました。続けて一文を投稿できます。"
     else
-      redirect_to new_book_path, alert: "書誌情報が見つかりませんでした"
+      redirect_to new_book_path, alert: "OpenBD から書誌情報が見つかりませんでした"
     end
   end
 
