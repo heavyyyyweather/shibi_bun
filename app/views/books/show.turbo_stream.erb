@@ -1,21 +1,5 @@
-<%= turbo_stream.update "book_detail" do %>
-  <div id="book_detail" style="border: 1px solid #ccc; padding: 1rem; border-radius: 6px; background: #fafafa;">
-    <h2><%= @book.title %></h2>
-    <p>
-      <strong>著者:</strong>
-      <%= @book.contributors.map(&:name).join(", ") %><br>
-      <strong>出版社:</strong> <%= @book.publisher.presence || "不明" %><br>
-      <strong>出版日:</strong> <%= @book.published_on&.strftime("%Y年%m月%d日") || "不明" %><br>
-      <strong>ISBN:</strong> <%= @book.isbn13.presence || "なし" %><br>
-      <strong>データ提供元:</strong> <%= @book.api_provider %>
-    </p>
-
-    <% if @book.cover_url.present? %>
-      <p><img src="<%= @book.cover_url %>" alt="書影" style="max-height: 200px;"></p>
-    <% end %>
-
-    <p style="font-size: 0.85rem; color: #666;">
-      登録日時: <%= @book.created_at.strftime("%Y-%m-%d %H:%M") %>
-    </p>
-  </div>
+<!-- app/views/books/show.turbo_stream.erb -->
+<%= turbo_stream.update "book_modal" do %>
+  <%= render partial: "books/modal", locals: { book: @book } %>
 <% end %>
+

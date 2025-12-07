@@ -4,7 +4,7 @@
 require Rails.root.join("lib/amazon_cover_helper")
 
 class BookLookupService
-  CLIENTS = [OpenbdClient, RakutenBooksClient, GoogleBooksClient]
+  CLIENTS = [OpenbdClient]
 
   def self.lookup(isbn)
     CLIENTS.each do |client|
