@@ -1,48 +1,71 @@
 <!-- app/views/books/new.html.erb -->
 
-<h2>書籍の手動登録</h2>
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <h1 class="h4 mb-4 text-center">書籍を手動で登録する</h1>
 
-<p class="text-muted small">
-  ISBN検索で書誌情報が取得できなかった場合は、ここから手動で登録してください。
-</p>
+      <% if flash[:alert].present? %>
+        <div class="alert alert-danger">
+          <%= flash[:alert] %>
+        </div>
+      <% end %>
 
-<%= form_with model: @book, local: true do |form| %>
-  <!-- ISBN 必須 -->
-  <div class="mb-3">
-    <%= form.label :isbn13, "ISBNコード（必須）" %><br>
-    <%= form.text_field :isbn13,
-          class: "form-control",
-          required: true %>
+      <% if @book && @book.errors.any? %>
+        <div class="alert alert-danger">
+          <ul class="mb-0">
+            <% @book.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <p class="text-muted small mb-3">
+            ISBN 検索で見つからなかった書籍を、手動で登録します。すべて必須項目です。
+          </p>
+
+          <%= form_with model: @book, url: books_path, local: true do |f| %>
+            <div class="mb-3">
+              <%= f.label :isbn13, "ISBN（必須）", class: "form-label" %>
+              <%= f.text_field :isbn13,
+                    class: "form-control",
+                    placeholder: "例: 9784101010038" %>
+            </div>
+
+            <div class="mb-3">
+              <%= f.label :title, "書名（必須）", class: "form-label" %>
+              <%= f.text_field :title,
+                    class: "form-control",
+                    placeholder: "例: ねじまき鳥クロニクル 第1部" %>
+            </div>
+
+            <div class="mb-3">
+              <%= f.label :author_name, "著者（必須）", class: "form-label" %>
+              <%= f.text_field :author_name,
+                    class: "form-control",
+                    placeholder: "例: 村上春樹" %>
+            </div>
+
+            <div class="mb-4">
+              <%= f.label :publisher, "出版社（必須）", class: "form-label" %>
+              <%= f.text_field :publisher,
+                    class: "form-control",
+                    placeholder: "例: 新潮社" %>
+            </div>
+
+            <div class="d-grid">
+              <%= f.submit "書籍を登録する", class: "btn btn-primary" %>
+            </div>
+          <% end %>
+
+          <div class="mt-3 text-center">
+            <%= link_to "ISBN 検索に戻る", search_books_path, class: "text-muted small" %>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <!-- 書名 必須 -->
-  <div class="mb-3">
-    <%= form.label :title, "書名（必須）" %><br>
-    <%= form.text_field :title,
-          placeholder: "例: ねじまき鳥クロニクル〈第1部〉泥棒かささぎ編",
-          class: "form-control",
-          required: true %>
-  </div>
-
-  <!-- 著者名 必須 -->
-  <div class="mb-3">
-    <%= form.label :author_name, "著者名（必須）" %><br>
-    <%= form.text_field :author_name,
-          placeholder: "例: 村上 春樹",
-          class: "form-control",
-          required: true %>
-  </div>
-
-  <!-- 出版社 必須 -->
-  <div class="mb-3">
-    <%= form.label :publisher, "出版社（必須）" %><br>
-    <%= form.text_field :publisher,
-          placeholder: "例: 新潮社",
-          class: "form-control",
-          required: true %>
-  </div>
-
-  <div class="mt-3">
-    <%= form.submit "書籍を登録", class: "btn btn-primary" %>
-  </div>
-<% end %>
+</div>

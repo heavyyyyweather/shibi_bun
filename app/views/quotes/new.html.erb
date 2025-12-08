@@ -33,9 +33,23 @@
           </div>
         <% end %>
 
-        <div class="mb-3">
-          <%= f.label :body, "引用本文（200字以内）", class: "form-label" %>
-          <%= f.text_area :body, rows: 5, class: "form-control" %>
+        <div class="mb-3"
+             data-controller="char-count"
+             data-char-count-max-value="250">
+          <%= f.label :body, "引用本文（250字以内）", class: "form-label" %>
+
+          <%= f.text_area :body,
+                rows: 5,
+                class: "form-control",
+                data: {
+                  "char-count-target": "input",
+                  action: "input->char-count#update"
+                } %>
+
+          <div class="text-muted small mt-1"
+               data-char-count-target="counter">
+            0 / 250
+          </div>
         </div>
 
         <div class="mb-3">
