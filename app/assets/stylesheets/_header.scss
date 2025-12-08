@@ -1,0 +1,66 @@
+/* app/assets/stylesheets/_header.scss */
+
+/* ヘッダー全体 */
+.app-header {
+  position: sticky;      /* スクロールしても上部に張り付く */
+  top: 0;
+  z-index: 1000;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+/* 中身の横並び */
+.app-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 左ロゴ / 右リンクを両端に */
+  padding: 0.75rem 1rem;
+}
+
+/* ロゴ（サイトタイトル） */
+.app-header__logo {
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: #222;
+}
+
+/* ナビゲーション部分（リンクの並び） */
+.app-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* 共通リンクスタイル */
+.app-header__link {
+  font-size: 0.9rem;
+  text-decoration: none;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  color: #333;
+}
+
+/* メインボタン（「一文を投稿する」） */
+.app-header__link--primary {
+  background-color: #198754;  /* Bootstrap の btn-success っぽさ */
+  color: #fff;
+  border-color: #198754;
+}
+
+.app-header__link--primary:hover {
+  background-color: #157347;
+  border-color: #146c43;
+  color: #fff;
+}
+
+/* サブリンク（書籍登録） */
+.app-header__link:not(.app-header__link--primary) {
+  border-color: #ccc;
+  background-color: #fff;
+}
+
+.app-header__link:not(.app-header__link--primary):hover {
+  background-color: #f8f9fa;
+}

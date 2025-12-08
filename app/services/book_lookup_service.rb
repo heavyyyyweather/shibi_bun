@@ -4,7 +4,7 @@
 require Rails.root.join("lib/amazon_cover_helper")
 
 class BookLookupService
-  CLIENTS = [OpenbdClient, RakutenBooksClient, GoogleBooksClient]
+  CLIENTS = [OpenbdClient]
 
   def self.lookup(isbn)
     CLIENTS.each do |client|
@@ -30,17 +30,19 @@ class BookLookupService
       summary = result["summary"] || {}
       return nil if summary.blank?
 
-     {
-        title: summary["title"],
-        author: summary["author"], # => contributors へも使える
-        publisher: summary["publisher"],
+      clean_author = Book.clean_person_name(summary["author"])
+
+      {
+        title:        summary["title"],
+        author:       clean_author,
+        publisher:    summary["publisher"],
         published_on: summary["pubdate"],
-        isbn13: summary["isbn"],
-        cover_url: AmazonCoverHelper.url_for(summary["isbn"]),
+        isbn13:       summary["isbn"],
+        cover_url:    AmazonCoverHelper.url_for(summary["isbn"]),
         api_provider: "openbd",
         api_synced_at: Time.current,
-        api_payload: result.to_json,
-        contributors: summary["author"] # 文字列で保持するならこれでOK
+        api_payload:  result.to_json,
+        contributors: clean_author
       }
 
     when "RakutenBooksClient"

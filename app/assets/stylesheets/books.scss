@@ -1,0 +1,10 @@
+/* 検索結果カードをコンパクトに */
+.book-card {
+  max-width: 400px;      /* カード幅を小さめに固定 */
+  margin: 0 auto;        /* 中央寄せ */
+}
+
+.book-card img {
+  max-height: 320px;     /* 画像の高さを制限 */
+  object-fit: contain;   /* 画像比率を保持して縮小 */
+}

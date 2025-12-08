@@ -1,0 +1,16 @@
+<!-- app/views/shared/_header.html.erb -->
+<header class="app-header">
+  <div class="app-header__inner container">
+    <%= link_to root_path, class: "app-header__logo" do %>
+      一文.com
+    <% end %>
+
+    <% unless hide_new_quote_button? %>
+      <nav class="app-header__nav">
+        <%= link_to "一文を投稿する",
+                    search_books_path,
+                    class: "app-header__link app-header__link--primary" %>
+      </nav>
+    <% end %>
+  </div>
+</header>

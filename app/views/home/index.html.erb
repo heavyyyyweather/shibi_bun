@@ -1,17 +1,6 @@
 <!-- app/views/home/index.html.erb -->
 <div class="home-page">
-  <header class="home-header">
-    <h1 class="site-title">Ichibun</h1>
-
-    <p class="new-quote-link">
-      <%= link_to "一文を投稿する", new_quote_path %>
-    </p>
-  </header>
-
-  <hr class="home-divider">
-
   <main class="home-main">
-    <h2 class="section-title">公開された一文</h2>
 
     <% if @quotes.blank? %>
       <p class="empty-message">まだ公開された一文はありません。</p>

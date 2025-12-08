@@ -18,7 +18,18 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
+<body>
+  <%= render "shared/header" %>  <!-- 共通ヘッダー -->
+
+  <div class="flash-area">
+    <% flash.each do |key, message| %>
+      <div class="alert alert-<%= key == "notice" ? "success" : "danger" %>">
+        <%= message %>
+      </div>
+    <% end %>
+  </div>
+
+  <main class="app-main">
     <%= yield %>
-  </body>
-</html>
+  </main>
+</body>
