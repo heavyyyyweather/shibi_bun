@@ -1,67 +1,74 @@
-<div class="container my-4">
-  <h1 class="mb-4">Step 1: ISBNで検索</h1>
+<!-- app/views/books/search.html.erb -->
 
-  <%= form_with url: search_books_path, method: :get, local: true do |f| %>
-    <div class="mb-3">
-      <%= f.label :q, "ISBN（10桁 / 13桁）", class: "form-label" %>
-      <%= f.text_field :q,
-                       value: @query,
-                       class: "form-control",
-                       placeholder: "例: 9784101010038 / 4101010031" %>
-    </div>
-    <%= f.submit "検索", class: "btn btn-primary" %>
-  <% end %>
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
 
-  <hr>
+      <h1 class="h4 mb-4 text-center">Step 1: ISBNで書籍を検索する</h1>
 
-  <% if @search_results.present? %>
-    <h2>検索結果</h2>
-    <!-- 結果リスト -->
-  <% elsif params[:isbn].present? %>
-    <p>該当する書籍は見つかりませんでした。</p>
-  <% end %>
+      <% if flash[:alert].present? %>
+        <div class="alert alert-danger">
+          <%= flash[:alert] %>
+        </div>
+      <% end %>
 
-  <div class="mt-4">
-    <%= link_to "手動で登録する", new_book_path(isbn: @query), class: "btn btn-outline-secondary" %>
-  </div>
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <p class="text-muted small mb-3">
+            ISBN（10桁 or 13桁）を入力してください。
+          </p>
 
-  <% if @query.present? %>
-    <hr>
-    <h2 class="h5">検索結果</h2>
-
-    <% if @results.any? %>
-      <div class="row">
-        <% @results.each do |res| %>
-          <% summary = res[:data]["summary"] %>
-          <% title = summary["title"] %>
-          <% author = summary["author"] %>
-          <% publisher = summary["publisher"] %>
-          <% pubdate = summary["pubdate"] %>
-          <% isbn13 = summary["isbn"] %>
-          <% cover_url = res[:cover_url] %>
-
-          <div class="col-md-4 col-sm-6 mb-4">
-            <div class="card h-100 book-card">
-              <% if cover_url.present? %>
-                <img src="<%= cover_url %>" class="card-img-top" alt="<%= title %>">
-              <% end %>
-              <div class="card-body">
-                <h5 class="card-title"><%= title %></h5>
-                <p class="card-text small">
-                  <%= author %><br>
-                  <%= publisher %><br>
-                  <%= pubdate %>
-                </p>
-                <%= button_to "この本を選ぶ", create_by_isbn_books_path(isbn: isbn13),
-                              method: :post,
-                              class: "btn btn-sm btn-success" %>
-              </div>
+          <%= form_with url: search_books_path, method: :get, local: true do %>
+            <div class="mb-3">
+              <%= label_tag :q, "ISBN（10桁 / 13桁）", class: "form-label" %>
+              <%= text_field_tag :q, @query, class: "form-control", placeholder: "例: 4101010031 / 9784101010038 " %>
             </div>
+
+            <div class="d-grid mb-3">
+              <%= submit_tag "検索", class: "btn btn-primary" %>
+            </div>
+          <% end %>
+
+          <div class="text-center">
+            <%= link_to "手動で登録する", new_book_path(isbn: @query), class: "btn btn-outline-secondary btn-sm" %>
           </div>
-        <% end %>
+        </div>
       </div>
-    <% else %>
-      <p class="text-muted mt-3">「<%= @query %>」に一致する書誌情報は見つかりませんでした。</p>
-    <% end %>
-  <% end %>
-</div>
+
+      <!-- 検索結果 -->
+<!-- 検索結果 -->
+<% if @results.present? %>
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h2 class="h6 mb-3">検索結果</h2>
+
+      <% @results.each do |result| %>
+        <% summary = result[:data]["summary"] %>
+        <% isbn13 = summary["isbn"] %>
+
+        <div class="border rounded p-3 mb-3">
+          <p class="mb-1">
+            <strong><%= summary["title"] %></strong>
+          </p>
+          <p class="mb-1">
+            著者: <%= summary["author"] %><br>
+            出版社: <%= summary["publisher"] %><br>
+            ISBN: <%= isbn13 %>
+          </p>
+
+          <% if result[:cover_url].present? %>
+            <div class="mb-2">
+              <img src="<%= result[:cover_url] %>" class="img-fluid" style="max-height: 150px;">
+            </div>
+          <% end %>
+
+          <%= button_to "この本を選ぶ",
+                create_by_isbn_books_path(isbn: isbn13),
+                method: :post,
+                class: "btn btn-success btn-sm" %>
+        </div>
+      <% end %>
+
+    </div>
+  </div>
+<% end %>

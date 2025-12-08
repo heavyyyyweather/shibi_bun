@@ -34,11 +34,12 @@
   margin: 0;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .quote-card {
-    width: 85vw;
-    height: 75vh;
-    font-size: 1.3rem;
-    padding: 1rem;
+    width: 90vw;          /* スマホは横幅広めでOK */
+    height: 85vh;         /* スマホで見やすいよう少し高め */
+
+    column-count: 2;      /* ★ 2段組にする */
+    column-gap: 2rem;     /* 段間の余白 */
   }
 }
